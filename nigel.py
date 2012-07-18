@@ -3,6 +3,7 @@ import sys
 from twisted.words.protocols import irc
 from twisted.internet import reactor, protocol
 from twisted.python import log
+from sifter import parse
 
 
 matchers = []
@@ -25,6 +26,23 @@ class BaseMatcher(object):
         Say something
         """
         brain.bot.msg(channel, message)
+
+
+class SifterMatcher(BaseMatcher):
+
+    name = 'sifter'
+
+    def matches(self, message, user):
+        issues = parse(message)
+        return len(issues) != 0
+
+    def speak(self, message, brain, channel, user):
+        issues = parse(message)
+        message = str(", ".join(issues))
+        brain.bot.msg(channel, message)
+
+
+matchers.append(SifterMatcher())
 
 
 class SandwichMatcher(BaseMatcher):
@@ -159,13 +177,11 @@ class LogBot(irc.IRCClient):
         if msg.startswith(self.nickname + ":"):
             msg = msg.replace(self.nickname + ':', '')
             msg = msg.strip()
-            # msg = "%s: I am a log bot" % user
             self.brain.handle(channel, msg, user)
             self.logger.log("<%s> %s" % (self.nickname, msg))
             return
 
-        if self.nickname in msg:
-            self.brain.handle(channel, msg)
+        self.brain.handle(channel, msg)
 
     def action(self, user, channel, msg):
         """This will get called when the bot sees someone do an action."""
