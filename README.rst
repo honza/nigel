@@ -16,7 +16,7 @@ Installation
 
 ::
 
-    $ virtualevn env --no-site-packages
+    $ virtualenv env --no-site-packages
     $ source env/bin/activate
     $ pip install -r requirements.txt
 
