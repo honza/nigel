@@ -29,6 +29,28 @@ To have Nigel join the ``#room`` room and log traffic to ``room.log``:
 
     $ python nigel.py room room.log
 
+Available matchers
+------------------
+
+* help
+
+    This will print out a list of registered matchers.
+
+
+* arthur's g+
+
+    You can ask Nigel if Arthur's ISP is blocking Google+ today.  It will
+    respond to "is g+ blocked at arthur's house today?".
+
+* sifter
+
+    It will scan the room for mentions of Sifter issue numbers and reply with
+    the issues's title and URL.  Prefix numbers with ``#``.
+
+* sandwich
+
+    It will respond to "make me a sandwich" and "sudo make me a sandwich".
+
 License
 -------
 
