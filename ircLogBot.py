@@ -32,6 +32,19 @@ from twisted.python import log
 import time, sys
 
 
+class Brain(object):
+
+    def __init__(self, bot):
+        self.bot = bot
+
+    def handle(self, channel, message, user=None):
+        if user:
+            msg = user + ": "
+        else:
+            msg = ""
+        self.bot.msg(channel, msg + 'Hello thar')
+
+
 class MessageLogger:
     """
     An independent logger class (because separation of application
@@ -53,7 +66,7 @@ class MessageLogger:
 class LogBot(irc.IRCClient):
     """A logging IRC bot."""
     
-    nickname = "twistedbot"
+    nickname = "nigelbot"
     
     def connectionMade(self):
         irc.IRCClient.connectionMade(self)
@@ -91,9 +104,13 @@ class LogBot(irc.IRCClient):
 
         # Otherwise check to see if it is a message directed at me
         if msg.startswith(self.nickname + ":"):
-            msg = "%s: I am a log bot" % user
-            self.msg(channel, msg)
+            # msg = "%s: I am a log bot" % user
+            self.brain.handle(channel, msg, user)
             self.logger.log("<%s> %s" % (self.nickname, msg))
+            return
+
+        if self.nickname in msg:
+            self.brain.handle(channel, msg)
 
     def action(self, user, channel, msg):
         """This will get called when the bot sees someone do an action."""
@@ -109,17 +126,6 @@ class LogBot(irc.IRCClient):
         self.logger.log("%s is now known as %s" % (old_nick, new_nick))
 
 
-    # For fun, override the method that determines how a nickname is changed on
-    # collisions. The default method appends an underscore.
-    def alterCollidedNick(self, nickname):
-        """
-        Generate an altered version of a nickname that caused a collision in an
-        effort to create an unused related name for subsequent registration.
-        """
-        return nickname + '^'
-
-
-
 class LogBotFactory(protocol.ClientFactory):
     """A factory for LogBots.
 
@@ -132,6 +138,7 @@ class LogBotFactory(protocol.ClientFactory):
 
     def buildProtocol(self, addr):
         p = LogBot()
+        p.brain = Brain(p)
         p.factory = self
         return p
 
