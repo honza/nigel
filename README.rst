@@ -23,11 +23,11 @@ Installation
 Running
 -------
 
-To have Nigel join the ``#room`` room and log traffic to ``room.log``:
+To have Nigel join the ``#room``:
 
 ::
 
-    $ python nigel.py room room.log
+    $ python nigel.py room
 
 Available matchers
 ------------------
