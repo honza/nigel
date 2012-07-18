@@ -38,8 +38,9 @@ class SifterMatcher(BaseMatcher):
 
     def speak(self, message, brain, channel, user):
         issues = parse(message)
-        message = str(", ".join(issues))
-        brain.bot.msg(channel, message)
+        if issues:
+            message = str(", ".join(issues))
+            brain.bot.msg(channel, message)
 
 
 matchers.append(SifterMatcher())
