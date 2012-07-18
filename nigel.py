@@ -27,6 +27,27 @@ class BaseMatcher(object):
         brain.bot.msg(channel, message)
 
 
+class SandwichMatcher(BaseMatcher):
+
+    text = "make me a sandwich"
+    name = "sandwich"
+
+    def matches(self, message, user):
+        return self.text in message.lower()
+
+    def speak(self, message, brain, channel, user):
+        if 'sudo' in message:
+            message = "OK, fine..."
+        else:
+            message = "You wish"
+        if user:
+            message = user + ": " + message
+        brain.bot.msg(channel, message)
+
+
+matchers.append(SandwichMatcher())
+
+
 class ArthurGooglePlusMatcher(BaseMatcher):
 
     text = "is g+ blocked at arthur's house today"
