@@ -1,48 +1,80 @@
-# Copyright (c) Twisted Matrix Laboratories.
-# See LICENSE for details.
-
-
-"""
-An example IRC log bot - logs a channel's events to a file.
-
-If someone says the bot's name in the channel followed by a ':',
-e.g.
-
-  <foo> logbot: hello!
-
-the bot will reply:
-
-  <logbot> foo: I am a log bot
-
-Run this script with two arguments, the channel name the bot should
-connect to, and file to log to, e.g.:
-
-  $ python ircLogBot.py test test.log
-
-will log channel #test to the file 'test.log'.
-"""
-
-
-# twisted imports
+import time
+import sys
 from twisted.words.protocols import irc
 from twisted.internet import reactor, protocol
 from twisted.python import log
 
-# system imports
-import time, sys
+
+matchers = []
+
+
+class BaseMatcher(object):
+    """
+    Subclass the ``BaseMatcher`` to create your own.  Register it by adding an
+    instance of the subclass to ``matchers``.
+    """
+
+    def matches(self, message, user):
+        """
+        Return ``True`` is a match was found.
+        """
+        raise NotImplementedError
+
+    def speak(self, message, brain, channel, user):
+        """
+        Say something
+        """
+        brain.bot.msg(channel, message)
+
+
+class ArthurGooglePlusMatcher(BaseMatcher):
+
+    text = "is g+ blocked at arthur's house today"
+    name = 'Arthur G+'
+
+    def matches(self, message, user):
+        return self.text in message.lower()
+
+    def speak(self, message, brain, channel, user):
+        message = "Most likely."
+        if user:
+            message = user + ": " + message
+        brain.bot.msg(channel, message)
+
+
+matchers.append(ArthurGooglePlusMatcher())
+
+
+class HelpMatcher(BaseMatcher):
+
+    name = 'help'
+
+    def matches(self, message, user):
+        return user and message.startswith('help')
+
+    def speak(self, message, brain, channel, user):
+        message = user + ": registered matchers: " + \
+                ", ".join([m.name for m in matchers])
+        brain.bot.msg(channel, message)
+
+
+matchers.append(HelpMatcher())
 
 
 class Brain(object):
+    """
+    Check an incoming message against registered matchers and let the matchers
+    speak into the channel.
+    """
 
     def __init__(self, bot):
         self.bot = bot
 
     def handle(self, channel, message, user=None):
-        if user:
-            msg = user + ": "
-        else:
-            msg = ""
-        self.bot.msg(channel, msg + 'Hello thar')
+        for matcher in matchers:
+            if matcher.matches(message, user):
+                matcher.speak(message, self, channel, user)
+                break
 
 
 class MessageLogger:
@@ -104,6 +136,8 @@ class LogBot(irc.IRCClient):
 
         # Otherwise check to see if it is a message directed at me
         if msg.startswith(self.nickname + ":"):
+            msg = msg.replace(self.nickname + ':', '')
+            msg = msg.strip()
             # msg = "%s: I am a log bot" % user
             self.brain.handle(channel, msg, user)
             self.logger.log("<%s> %s" % (self.nickname, msg))
