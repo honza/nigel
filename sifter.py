@@ -4,7 +4,7 @@ import re
 import json
 
 
-NUM_REGEX = r'([0-9]{3,})'
+NUM_REGEX = r'\#([0-9])'
 API_KEY = os.environ['SIFTER']
 
 
@@ -23,7 +23,8 @@ def find_ticket(number):
 
 
 def format_ticket(issue):
-    return "%s - %s" % (issue['number'], issue['url'])
+    url = "https://unisubs.sifterapp.com/issue/%s" % issue['number']
+    return "%s - %s - %s" % (issue['number'], issue['subject'], url)
 
 
 def parse(text):
