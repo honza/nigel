@@ -30,6 +30,7 @@ class BaseMatcher(object):
 
 class GreetingMatcher(object):
 
+    name = 'greeter'
     greetings = [
         'all: morning',
         'all: howdy',
