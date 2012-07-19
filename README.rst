@@ -59,6 +59,11 @@ Available matchers
 
     It will respond to "make me a sandwich" and "sudo make me a sandwich".
 
+* greeter
+
+    When someone greets the room with "all: hello" and the like, nigel will
+    respond.
+
 License
 -------
 
