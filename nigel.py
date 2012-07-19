@@ -1,4 +1,5 @@
 import sys
+import os
 from twisted.words.protocols import irc
 from twisted.internet import reactor, protocol
 from twisted.python import log
@@ -25,6 +26,37 @@ class BaseMatcher(object):
         Say something
         """
         brain.bot.msg(channel, message)
+
+
+class GreetingMatcher(object):
+
+    greetings = [
+        'all: morning',
+        'all: howdy',
+        'all: greetings',
+        'all: hello',
+        'all: hey',
+        'all: hi',
+        ''
+    ]
+
+    def matches(self, message, user):
+        """
+        Return ``True`` is a match was found.
+        """
+        return message.lower() in self.greetings
+
+    def speak(self, message, brain, channel, user):
+        """
+        Say something
+        """
+        message = "hey"
+        if user:
+            message = user + ": " + message
+        brain.bot.msg(channel, message)
+
+
+matchers.append(GreetingMatcher())
 
 
 class SifterMatcher(BaseMatcher):
@@ -182,7 +214,10 @@ if __name__ == '__main__':
     log.startLogging(sys.stdout)
     
     # create factory protocol and application
-    f = LogBotFactory(sys.argv[1])
+    room = os.environ.get('ROOM')
+    if not room:
+        room = sys.argv[1]
+    f = LogBotFactory(room)
 
     # connect factory to this host and port
     reactor.connectTCP("irc.freenode.net", 6667, f)

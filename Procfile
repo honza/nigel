@@ -1,1 +1,1 @@
-nigel: python nigel.py amara
+nigel: python nigel.py
