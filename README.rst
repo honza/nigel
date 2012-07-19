@@ -68,6 +68,18 @@ greeter
 When someone greets the room with "all: hello" and the like, nigel will
 respond.
 
+Deploying to Heroku
+~~~~~~~~~~~~~~~~~~~
+
+::
+
+    $ git clone git://github.com/honza/nigel.git
+    $ cd nigel
+    $ heroku create --stack cedar
+    $ heroku config:add ROOM=room SIFTER=yourapikey
+    $ git push heroku master
+    $ heroku scale nigel=1
+
 License
 -------
 
