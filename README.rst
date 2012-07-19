@@ -69,7 +69,7 @@ When someone greets the room with "all: hello" and the like, nigel will
 respond.
 
 Deploying to Heroku
-~~~~~~~~~~~~~~~~~~~
+-------------------
 
 ::
 
