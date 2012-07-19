@@ -40,29 +40,33 @@ Or,
 Available matchers
 ------------------
 
-* help
+help
+~~~~
 
-    This will print out a list of registered matchers.
+This will print out a list of registered matchers.
 
+arthur's g+
+~~~~~~~~~~~
 
-* arthur's g+
+You can ask Nigel if Arthur's ISP is blocking Google+ today.  It will respond
+to "is g+ blocked at arthur's house today?".
 
-    You can ask Nigel if Arthur's ISP is blocking Google+ today.  It will
-    respond to "is g+ blocked at arthur's house today?".
+sifter
+~~~~~~
 
-* sifter
+It will scan the room for mentions of Sifter issue numbers and reply with the
+issues's title and URL.  Prefix numbers with ``#``.
 
-    It will scan the room for mentions of Sifter issue numbers and reply with
-    the issues's title and URL.  Prefix numbers with ``#``.
+sandwich
+~~~~~~~~
 
-* sandwich
+It will respond to "make me a sandwich" and "sudo make me a sandwich".
 
-    It will respond to "make me a sandwich" and "sudo make me a sandwich".
+greeter
+~~~~~~~
 
-* greeter
-
-    When someone greets the room with "all: hello" and the like, nigel will
-    respond.
+When someone greets the room with "all: hello" and the like, nigel will
+respond.
 
 License
 -------
