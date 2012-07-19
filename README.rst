@@ -19,6 +19,7 @@ Installation
     $ virtualenv env --no-site-packages
     $ source env/bin/activate
     $ pip install -r requirements.txt
+    $ export SIFTER=yourapikey
 
 Running
 -------
@@ -28,6 +29,13 @@ To have Nigel join the ``#room``:
 ::
 
     $ python nigel.py room
+
+Or,
+
+::
+
+    $ export ROOM=room
+    $ python nigel.py
 
 Available matchers
 ------------------
