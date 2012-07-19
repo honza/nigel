@@ -80,6 +80,12 @@ Deploying to Heroku
     $ git push heroku master
     $ heroku scale nigel=1
 
+Credit
+------
+
+Mr. `cz <https://github.com/cz>`_ is responsible for the awesome name of this
+bot.
+
 License
 -------
 
