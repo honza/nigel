@@ -9,6 +9,9 @@ from sifter import parse
 matchers = []
 
 
+IGNORED_USERS = os.environ.get('IGNORED', '').split(',')
+
+
 class BaseMatcher(object):
     """
     Subclass the ``BaseMatcher`` to create your own.  Register it by adding an
@@ -146,7 +149,6 @@ class Brain(object):
         for matcher in matchers:
             if matcher.matches(message, user):
                 matcher.speak(message, self, channel, user)
-                break
 
 
 class LogBot(irc.IRCClient):
@@ -169,6 +171,10 @@ class LogBot(irc.IRCClient):
     def privmsg(self, user, channel, msg):
         """This will get called when the bot receives a message."""
         user = user.split('!', 1)[0]
+
+        if user in IGNORED_USERS:
+            print 'ignoring message from:', user
+            return
         
         # Check to see if they're sending me a private message
         if channel == self.nickname:
