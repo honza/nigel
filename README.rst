@@ -37,6 +37,16 @@ Or,
     $ export ROOM=room
     $ python nigel.py
 
+You can ignore all messages from a certain user by adding this environment
+variable:
+
+::
+
+    $ export IGNORED="user1,user2"
+
+This is useful if you don't care about what your build server says in the
+channel.
+
 Available matchers
 ------------------
 
