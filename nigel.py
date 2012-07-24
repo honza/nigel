@@ -80,7 +80,7 @@ class SifterMatcher(BaseMatcher):
 
     def respond(self, message, user=None):
         issues = parse(message)
-        if len(issues) != 0:
+        if len(issues) == 0:
             return
         message = str(", ".join(issues))
         self.speak(message)
