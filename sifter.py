@@ -4,7 +4,7 @@ import re
 import json
 
 
-NUM_REGEX = r'\#([0-9]+)'
+NUM_REGEX = r'\b\#?(\d\d\d\d?\d?)\b'
 API_KEY = os.environ['SIFTER']
 
 
