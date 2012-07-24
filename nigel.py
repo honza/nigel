@@ -1,14 +1,12 @@
 import sys
 import os
+import re
+from datetime import datetime, timedelta
 from twisted.words.protocols import irc
 from twisted.internet import reactor, protocol
 from twisted.python import log
 from sifter import parse
 import gifter
-import re
-
-matchers = []
-
 
 IGNORED_USERS = os.environ.get('IGNORED', '').split(',')
 
@@ -19,20 +17,17 @@ class BaseMatcher(object):
     instance of the subclass to ``matchers``.
     """
 
-    def matches(self, message, user):
-        """
-        Return ``True`` is a match was found.
-        """
+    def respond(self, message):
         raise NotImplementedError
 
-    def speak(self, message, brain, channel, user):
+    def speak(self, message):
         """
         Say something
         """
-        brain.bot.msg(channel, message)
+        self.brain.bot.msg(self.channel, message)
 
 
-class GreetingMatcher(object):
+class GreetingMatcher(BaseMatcher):
 
     name = 'greeter'
     greetings = [
@@ -45,41 +40,50 @@ class GreetingMatcher(object):
         ''
     ]
 
-    def matches(self, message, user):
-        """
-        Return ``True`` is a match was found.
-        """
-        return message.lower() in self.greetings
-
-    def speak(self, message, brain, channel, user):
-        """
-        Say something
-        """
-        message = "hey"
-        if user:
-            message = user + ": " + message
-        brain.bot.msg(channel, message)
+    def respond(self, message, user=None):
+        if message.lower() in self.greetings:
+            message = "hey"
+            if user:
+                message = user + ": " + message
+            self.speak(message)
 
 
-matchers.append(GreetingMatcher())
+class BrbMatcher(BaseMatcher):
+
+    name = 'brb'
+    memory = {}
+    regex = r'([0-9]{1,3})min'
+
+    def respond(self, message, user=None):
+        if 'brb' in message.lower():
+            matches = re.findall(self.regex, message.lower())
+            if matches:
+                now = datetime.now()
+                due = now + timedelta(minutes=int(matches[0]))
+                self.memory[user] = due
+        elif 'all: back' in message.lower():
+            if user in self.memory.keys():
+                # Returning user
+                due = self.memory[user]
+                now = datetime.now()
+                if now > due:
+                    message = user + ": " + "You are late. :)"
+                    self.speak(message)
+                self.memory.pop(user)
+        else:
+            pass
 
 
 class SifterMatcher(BaseMatcher):
 
     name = 'sifter'
 
-    def matches(self, message, user):
+    def respond(self, message, user=None):
         issues = parse(message)
-        return len(issues) != 0
-
-    def speak(self, message, brain, channel, user):
-        issues = parse(message)
-        if issues:
-            message = str(", ".join(issues))
-            brain.bot.msg(channel, message)
-
-
-matchers.append(SifterMatcher())
+        if len(issues) != 0:
+            return
+        message = str(", ".join(issues))
+        self.speak(message)
 
 
 class SandwichMatcher(BaseMatcher):
@@ -87,20 +91,15 @@ class SandwichMatcher(BaseMatcher):
     text = "make me a sandwich"
     name = "sandwich"
 
-    def matches(self, message, user):
-        return self.text in message.lower()
-
-    def speak(self, message, brain, channel, user):
-        if 'sudo' in message:
-            message = "OK, fine..."
-        else:
-            message = "You wish"
-        if user:
-            message = user + ": " + message
-        brain.bot.msg(channel, message)
-
-
-matchers.append(SandwichMatcher())
+    def respond(self, message, user=None):
+        if self.text in message.lower():
+            if 'sudo' in message:
+                message = "OK, fine..."
+            else:
+                message = "You wish"
+            if user:
+                message = user + ": " + message
+            self.speak(message)
 
 
 class ArthurGooglePlusMatcher(BaseMatcher):
@@ -108,51 +107,27 @@ class ArthurGooglePlusMatcher(BaseMatcher):
     text = "is g+ blocked at arthur's house today"
     name = 'Arthur G+'
 
-    def matches(self, message, user):
-        return self.text in message.lower()
+    def respond(self, message, user=None):
+        if self.text in message.lower():
+            message = "Most likely."
+            if user:
+                message = user + ": " + message
+            self.speak(message)
 
-    def speak(self, message, brain, channel, user):
-        message = "Most likely."
-        if user:
-            message = user + ": " + message
-        brain.bot.msg(channel, message)
-
-
-matchers.append(ArthurGooglePlusMatcher())
 
 class GifterMatcher(BaseMatcher):
 
     name = 'gifter'
+    request_regex = r'\.?(show\s)?(me\s)?\s?(the\s)?gif\.?'
 
-    def matches(self, message, user):
+    def respond(self, message, user=None):
         # parse and save
         gifter.save(message, user)
         # parse for request - only if direct message
         if user:
-            request_regex = r'\.?(show\s)?(me\s)?\s?(the\s)?gif\.?'
-            return re.match(request_regex, message, re.IGNORECASE)
-
-    def speak(self, message, brain, channel, user):
-        message = gifter.random()
-        brain.bot.msg(channel, message)
-
-
-matchers.append(GifterMatcher())
-
-class HelpMatcher(BaseMatcher):
-
-    name = 'help'
-
-    def matches(self, message, user):
-        return user and message.startswith('help')
-
-    def speak(self, message, brain, channel, user):
-        message = user + ": registered matchers: " + \
-                ", ".join([m.name for m in matchers])
-        brain.bot.msg(channel, message)
-
-
-matchers.append(HelpMatcher())
+            if re.match(self.request_regex, message, re.IGNORECASE):
+                message = gifter.random()
+                self.speak(message)
 
 
 class Brain(object):
@@ -161,13 +136,25 @@ class Brain(object):
     speak into the channel.
     """
 
-    def __init__(self, bot):
+    def __init__(self, bot, matchers):
         self.bot = bot
+        self.channel = None
+        self.matchers = []
+        map(self.register, matchers)
+
+    def register(self, matcher):
+        matcher.brain = self
+        matcher.brain = self
+        self.matchers.append(matcher)
+
+    def set_channel(self, channel):
+        for matcher in self.matchers:
+            matcher.channel = channel
+        self.channel = channel
 
     def handle(self, channel, message, user=None):
-        for matcher in matchers:
-            if matcher.matches(message, user):
-                matcher.speak(message, self, channel, user)
+        for matcher in self.matchers:
+            matcher.respond(message, user)
 
 
 class LogBot(irc.IRCClient):
@@ -191,6 +178,9 @@ class LogBot(irc.IRCClient):
         """This will get called when the bot receives a message."""
         user = user.split('!', 1)[0]
 
+        if not self.brain.channel:
+            self.brain.set_channel(channel)
+
         if user in IGNORED_USERS:
             print 'ignoring message from:', user
             return
@@ -208,7 +198,7 @@ class LogBot(irc.IRCClient):
             self.brain.handle(channel, msg, user)
             return
 
-        self.brain.handle(channel, msg)
+        self.brain.handle(channel, msg, user)
 
 
 class LogBotFactory(protocol.ClientFactory):
@@ -222,7 +212,8 @@ class LogBotFactory(protocol.ClientFactory):
 
     def buildProtocol(self, addr):
         p = LogBot()
-        p.brain = Brain(p)
+        p.brain = Brain(p, [GreetingMatcher(), BrbMatcher(), SifterMatcher(),
+                SandwichMatcher(), ArthurGooglePlusMatcher(), GifterMatcher()])
         p.factory = self
         return p
 

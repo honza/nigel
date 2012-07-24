@@ -52,10 +52,12 @@ channel.
 Available matchers
 ------------------
 
-help
-~~~~
+brb
+~~~
 
-This will print out a list of registered matchers.
+People often say things like ``all: brb, back in 20min`` and then when they
+come back they're like ``all: back``.  This matcher will track how long the
+user has been gone and tell them if they overshot their estimate.
 
 arthur's g+
 ~~~~~~~~~~~
