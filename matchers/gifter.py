@@ -55,7 +55,12 @@ def save_link(text, author, tags=[]):
     if author:
         tags.append(author)
     tags.append(snip_hash)
-    snip = {'title': time.time(), 'lexer': 'text', 'code': text, 'tags': ','.join(tags)}
+    snip = {
+        'title': time.time(),
+        'lexer': 'text',
+        'code': text,
+        'public': True,
+        'tags': ','.join(tags)}
     r = requests.post(URL % 'snipt/', headers=HEADERS, data=json.dumps(snip))
     if r.status_code != 201:
         logging.debug('Error saving: {0}'.format(r.text))
