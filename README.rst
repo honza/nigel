@@ -20,6 +20,8 @@ Installation
     $ source env/bin/activate
     $ pip install -r requirements.txt
     $ export SIFTER=yourapikey
+    $ export SNIPT_API_USER=sniptusername
+    $ export SNIPT_API_KEY=sniptapikey
 
 Running
 -------
@@ -78,6 +80,10 @@ greeter
 When someone greets the room with "all: hello" and the like, nigel will
 respond.
 
+gifter
+~~~~~~
+It will scan for .gif, .png, and .jpg images and add them to Snipt.net.  It will also respond to "<botname>: show me the gif" with random links to saved images.
+
 Deploying to Heroku
 -------------------
 
@@ -86,7 +92,7 @@ Deploying to Heroku
     $ git clone git://github.com/honza/nigel.git
     $ cd nigel
     $ heroku create --stack cedar
-    $ heroku config:add ROOM=room SIFTER=yourapikey
+    $ heroku config:add ROOM=room SIFTER=yourapikey SNIPT_API_USER=sniptuser SNIPT_API_KEY=sniptapikey
     $ git push heroku master
     $ heroku scale nigel=1
 

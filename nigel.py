@@ -4,7 +4,8 @@ from twisted.words.protocols import irc
 from twisted.internet import reactor, protocol
 from twisted.python import log
 from sifter import parse
-
+import gifter
+import re
 
 matchers = []
 
@@ -119,6 +120,24 @@ class ArthurGooglePlusMatcher(BaseMatcher):
 
 matchers.append(ArthurGooglePlusMatcher())
 
+class GifterMatcher(BaseMatcher):
+
+    name = 'gifter'
+
+    def matches(self, message, user):
+        # parse and save
+        gifter.save(message, user)
+        # parse for request - only if direct message
+        if user:
+            request_regex = r'\.?(show\s)?(me\s)?\s?(the\s)?gif\.?'
+            return re.match(request_regex, message, re.IGNORECASE)
+
+    def speak(self, message, brain, channel, user):
+        message = gifter.random()
+        brain.bot.msg(channel, message)
+
+
+matchers.append(GifterMatcher())
 
 class HelpMatcher(BaseMatcher):
 
@@ -153,9 +172,9 @@ class Brain(object):
 
 class LogBot(irc.IRCClient):
     """A logging IRC bot."""
-    
+
     nickname = "nigelbot"
-    
+
     def connectionMade(self):
         irc.IRCClient.connectionMade(self)
 
@@ -175,7 +194,7 @@ class LogBot(irc.IRCClient):
         if user in IGNORED_USERS:
             print 'ignoring message from:', user
             return
-        
+
         # Check to see if they're sending me a private message
         if channel == self.nickname:
             msg = "It isn't nice to whisper!  Play nice with the group."
@@ -219,7 +238,7 @@ class LogBotFactory(protocol.ClientFactory):
 if __name__ == '__main__':
     # initialize logging
     log.startLogging(sys.stdout)
-    
+
     # create factory protocol and application
     room = os.environ.get('ROOM')
     if not room:
