@@ -5,7 +5,7 @@ import json
 
 
 NUM_REGEX = r'\b\#?(\d\d\d\d?\d?)\b'
-API_KEY = os.environ['SIFTER']
+API_KEY = os.environ.get('SIFTER')
 
 
 def find_ticket(number):
