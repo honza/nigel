@@ -24,3 +24,6 @@ class GreetingMatcher(BaseMatcher):
             if user:
                 message = user + ": welcome back"
                 self.speak(message)
+
+        if message.lower() == 'all: lunch':
+            self.speak('nom nom nom')
