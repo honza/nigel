@@ -1,133 +1,15 @@
 import sys
 import os
-import re
-from datetime import datetime, timedelta
 from twisted.words.protocols import irc
 from twisted.internet import reactor, protocol
 from twisted.python import log
-from sifter import parse
-import gifter
+
+from matchers import (
+    BrbMatcher, ArthurGooglePlusMatcher, GreetingMatcher, SifterMatcher,
+    SandwichMatcher, GifterMatcher
+)
 
 IGNORED_USERS = os.environ.get('IGNORED', '').split(',')
-
-
-class BaseMatcher(object):
-    """
-    Subclass the ``BaseMatcher`` to create your own.  Register it by adding an
-    instance of the subclass to ``matchers``.
-    """
-
-    def respond(self, message):
-        raise NotImplementedError
-
-    def speak(self, message):
-        """
-        Say something
-        """
-        self.brain.bot.msg(self.channel, message)
-
-
-class GreetingMatcher(BaseMatcher):
-
-    name = 'greeter'
-    greetings = [
-        'all: morning',
-        'all: howdy',
-        'all: greetings',
-        'all: hello',
-        'all: hey',
-        'all: hi',
-        ''
-    ]
-
-    def respond(self, message, user=None):
-        if message.lower() in self.greetings:
-            message = "hey"
-            if user:
-                message = user + ": " + message
-            self.speak(message)
-
-
-class BrbMatcher(BaseMatcher):
-
-    name = 'brb'
-    memory = {}
-    regex = r'([0-9]{1,3})min'
-
-    def respond(self, message, user=None):
-        if 'brb' in message.lower():
-            matches = re.findall(self.regex, message.lower())
-            if matches:
-                now = datetime.now()
-                due = now + timedelta(minutes=int(matches[0]))
-                self.memory[user] = due
-        elif 'all: back' in message.lower():
-            if user in self.memory.keys():
-                # Returning user
-                due = self.memory[user]
-                now = datetime.now()
-                if now > due:
-                    message = user + ": " + "You are late. :)"
-                    self.speak(message)
-                self.memory.pop(user)
-        else:
-            pass
-
-
-class SifterMatcher(BaseMatcher):
-
-    name = 'sifter'
-
-    def respond(self, message, user=None):
-        issues = parse(message)
-        if len(issues) == 0:
-            return
-        message = str(", ".join(issues))
-        self.speak(message)
-
-
-class SandwichMatcher(BaseMatcher):
-
-    text = "make me a sandwich"
-    name = "sandwich"
-
-    def respond(self, message, user=None):
-        if self.text in message.lower():
-            if 'sudo' in message:
-                message = "OK, fine..."
-            else:
-                message = "You wish"
-            if user:
-                message = user + ": " + message
-            self.speak(message)
-
-
-class ArthurGooglePlusMatcher(BaseMatcher):
-
-    text = "is g+ blocked at arthur's house today"
-    name = 'Arthur G+'
-
-    def respond(self, message, user=None):
-        if self.text in message.lower():
-            message = "Most likely."
-            if user:
-                message = user + ": " + message
-            self.speak(message)
-
-
-class GifterMatcher(BaseMatcher):
-
-    name = 'gifter'
-    request_regex = r'\.?(show\s)?(me\s)?\s?(the\s)?gif\.?'
-
-    def respond(self, message, user=None):
-        # parse and save
-        gifter.save(message, user)
-        # parse for request - only if direct message
-        if user:
-            if re.match(self.request_regex, message, re.IGNORECASE):
-                message = gifter.random()
-                self.speak(message)
 
 
 class Brain(object):

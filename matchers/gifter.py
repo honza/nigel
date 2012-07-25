@@ -1,6 +1,7 @@
+import re
+from base import BaseMatcher
 import os
 import requests
-import re
 import json
 import time
 import hashlib
@@ -17,6 +18,7 @@ HEADERS = {
     'Content-Type': 'application/json',
 }
 
+
 def save(text, author):
     """
     Saves all images found in text.  Called from Nigel.
@@ -28,6 +30,7 @@ def save(text, author):
     # save imgs
     imgs = re.findall(IMG_REGEX, text, re.IGNORECASE)
     return [save_link(x, author) for x in imgs]
+
 
 def save_link(text, author, tags=[]):
     """
@@ -57,6 +60,7 @@ def save_link(text, author, tags=[]):
     if r.status_code != 201:
         logging.debug('Error saving: {0}'.format(r.text))
 
+
 def get_snips_by_tag(tag):
     """
     Returns a list of snipt.net snips containing the specified tag
@@ -78,9 +82,10 @@ def get_snips_by_tag(tag):
             r = requests.get(URL % 'snipt/?tag={0}'.format(tag_id), headers=HEADERS)
             objs = json.loads(r.content).get('objects')
             snips = objs
-    except Exception, e:
+    except Exception:
         logging.debug('Unable to find snip: {0}'.format(tag))
     return snips
+
 
 def random():
     """
@@ -92,3 +97,18 @@ def random():
     snips = get_snips_by_tag('nigel')
     link = snips[Random().randint(0, len(snips)-1)]
     return str(link.get('code')) # throws exception for unicode
+
+
+class GifterMatcher(BaseMatcher):
+
+    name = 'gifter'
+    request_regex = r'\.?(show\s)?(me\s)?\s?(the\s)?gif\.?'
+
+    def respond(self, message, user=None):
+        # parse and save
+        save(message, user)
+        # parse for request - only if direct message
+        if user:
+            if re.match(self.request_regex, message, re.IGNORECASE):
+                message = random()
+                self.speak(message)

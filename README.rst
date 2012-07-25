@@ -84,7 +84,10 @@ respond.
 
 gifter
 ~~~~~~
-It will scan for .gif, .png, and .jpg images and add them to Snipt.net.  It will also respond to "<botname>: show me the gif" with random links to saved images.
+
+It will scan for .gif, .png, and .jpg images and add them to Snipt.net.  It
+will also respond to "<botname>: show me the gif" with random links to saved
+images.
 
 Deploying to Heroku
 -------------------

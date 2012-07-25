@@ -1,3 +1,4 @@
+from base import BaseMatcher
 import os
 import requests
 import re
@@ -30,3 +31,15 @@ def format_ticket(issue):
 def parse(text):
     issues = re.findall(NUM_REGEX, text)
     return map(find_ticket, issues)
+
+
+class SifterMatcher(BaseMatcher):
+
+    name = 'sifter'
+
+    def respond(self, message, user=None):
+        issues = parse(message)
+        if len(issues) == 0:
+            return
+        message = str(", ".join(issues))
+        self.speak(message)
