@@ -8,7 +8,7 @@ import hashlib
 import logging
 from random import Random
 
-IMG_REGEX = r'.*(?:\.jpg|\.gif|\.png)'
+IMG_REGEX = r'\S+(?:\.jpe?g|\.gif|\.png)\b'
 API_USER = os.environ.get('SNIPT_API_USER')
 API_KEY = os.environ.get('SNIPT_API_KEY')
 URL = 'https://snipt.net/api/private/%s'
