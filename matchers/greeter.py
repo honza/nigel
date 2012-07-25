@@ -16,8 +16,11 @@ class GreetingMatcher(BaseMatcher):
 
     def respond(self, message, user=None):
         if message.lower() in self.greetings:
-            message = "hey"
             if user:
-                message = user + ": " + message
-            self.speak(message)
+                message = user + ": hey"
+                self.speak(message)
 
+        if message.lower() == 'all: back':
+            if user:
+                message = user + ": welcome back"
+                self.speak(message)
