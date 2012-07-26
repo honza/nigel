@@ -6,7 +6,7 @@ from twisted.python import log
 
 from matchers import (
     BrbMatcher, ArthurGooglePlusMatcher, GreetingMatcher, SifterMatcher,
-    SandwichMatcher, GifterMatcher
+    SandwichMatcher, GifterMatcher, CletusMatcher
 )
 
 IGNORED_USERS = os.environ.get('IGNORED', '').split(',')
@@ -95,7 +95,8 @@ class LogBotFactory(protocol.ClientFactory):
     def buildProtocol(self, addr):
         p = LogBot()
         p.brain = Brain(p, [GreetingMatcher(), BrbMatcher(), SifterMatcher(),
-                SandwichMatcher(), ArthurGooglePlusMatcher(), GifterMatcher()])
+                SandwichMatcher(), ArthurGooglePlusMatcher(), GifterMatcher(),
+                CletusMatcher()])
         p.factory = self
         return p
 
