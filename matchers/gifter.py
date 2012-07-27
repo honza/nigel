@@ -36,6 +36,8 @@ class GifterMatcher(BaseMatcher):
             # check for random request
             if re.match(self.request_regex, message, re.IGNORECASE):
                 message = self.random()
+                if not message:
+                    return
                 self.speak(message)
             # check for keywords
             keywords = [x for x in message.split() if x.lower() in KEYWORDS]
