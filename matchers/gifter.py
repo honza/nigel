@@ -59,8 +59,8 @@ def save_link(text, author, tags=[]):
     tags.append('tmp')
     snip = {
         'title': time.time(),
-        'lexer': 'text',
-        'code': text,
+        'lexer': 'markdown',
+        'code': '![{0}]({0})'.format(text),
         'tags': ','.join(tags)}
     r = requests.post(URL % 'snipt/', headers=HEADERS, data=json.dumps(snip))
     if r.status_code != 201:
@@ -102,8 +102,11 @@ def random():
     """
     snips = get_snips_by_tag('nigel')
     link = snips[Random().randint(0, len(snips)-1)]
-    return str(link.get('code')) # throws exception for unicode
-
+    # parse image link
+    md_regex = r'!\[.*\]\((.*)\)\s?'
+    match = re.match(md_regex, link.get('code'))
+    if match:
+        return str(' '.join([x for x in match.groups()])) # throws exception for unicode
 
 class GifterMatcher(BaseMatcher):
 
