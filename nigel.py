@@ -4,7 +4,7 @@ from twisted.words.protocols import irc
 from twisted.internet import reactor, protocol
 from twisted.python import log
 
-from matchers import BrbMatcher, SifterMatcher, GifterMatcher
+from matchers import BrbMatcher, SifterMatcher, GifterMatcher, JenkinsMatcher
 
 IGNORED_USERS = os.environ.get('IGNORED', '').split(',')
 
@@ -91,7 +91,8 @@ class LogBotFactory(protocol.ClientFactory):
 
     def buildProtocol(self, addr):
         p = LogBot()
-        p.brain = Brain(p, [BrbMatcher(), SifterMatcher(), GifterMatcher()])
+        p.brain = Brain(p, [BrbMatcher(), SifterMatcher(), GifterMatcher(),
+            JenkinsMatcher()])
         p.factory = self
         return p
 
