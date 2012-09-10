@@ -7,9 +7,18 @@ import json
 
 NUM_REGEX = r'(?:[\s#]|^)(\d\d\d\d?\d?)(?:[\s\.,\?!]|$)'
 API_KEY = os.environ.get('SIFTER')
+COMMON_HTTP_STATUS_CODES = [
+    '200',
+    '301', '302', '304',
+    '400', '401', '403', '404',
+    '500', '501', '502', '503', '504',
+]
 
 
 def find_ticket(number):
+    if number in COMMON_HTTP_STATUS_CODES:
+        return
+
     headers = {
         'X-Sifter-Token': API_KEY
     }
