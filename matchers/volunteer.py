@@ -5,8 +5,8 @@ from base import BaseMatcher
 class VolunteerMatcher(BaseMatcher):
     dev_text = "volunteer someone"
     all_text = "volunteer a dev"
-    dev_candidates = ['Steve', 'Arthur', 'Honza', 'Fernando', 'Nick']
-    all_candidates = dev_candidates + ['Craig', 'Evan']
+    dev_candidates = ['sjl', 'arthurdebert', 'honza', 'fernandotakai', 'nicksergeant']
+    all_candidates = dev_candidates + ['cz', 'ehazlett']
 
     def respond(self, message, user=None):
         if self.dev_text in message.lower():
