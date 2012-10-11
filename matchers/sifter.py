@@ -50,5 +50,5 @@ class SifterMatcher(BaseMatcher):
         issues = parse(message)
         if len(issues) == 0:
             return
-        message = ", ".join(issues)
+        message = str(", ".join(issues))
         self.speak(message)
