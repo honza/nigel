@@ -39,7 +39,7 @@ def format_ticket(issue):
 
 def parse(text):
     issues = re.findall(NUM_REGEX, text)
-    return map(find_ticket, issues)
+    return set(map(find_ticket, issues))
 
 
 class SifterMatcher(BaseMatcher):
@@ -50,5 +50,5 @@ class SifterMatcher(BaseMatcher):
         issues = parse(message)
         if len(issues) == 0:
             return
-        message = str(", ".join(issues))
+        message = ", ".join(issues)
         self.speak(message)
