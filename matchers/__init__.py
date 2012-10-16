@@ -7,3 +7,4 @@ from sandwich import SandwichMatcher
 from cletus import CletusMatcher
 from jenkins import JenkinsMatcher
 from volunteer import VolunteerMatcher
+from lunch import LunchMatcher
