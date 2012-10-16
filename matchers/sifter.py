@@ -5,7 +5,7 @@ import re
 import json
 
 
-NUM_REGEX = r'(?:[\s#]|^)(\d\d\d\d?\d?)(?:[\s\.,\?!]|$)'
+NUM_REGEX = r'(?:[\s#]|^i?|\si)(\d\d\d\d?\d?)(?:[\s\.,\?!]|$)'
 API_KEY = os.environ.get('SIFTER')
 COMMON_HTTP_STATUS_CODES = [
     '200',
