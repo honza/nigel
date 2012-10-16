@@ -3,8 +3,6 @@ import os
 import requests
 import re
 import json
-import times
-from datetime import datetime, timedelta
 
 
 NUM_REGEX = r'(?:[\s#]|^i?|\si)(\d\d\d\d?\d?)(?:[\s\.,\?!]|$)'
@@ -29,13 +27,9 @@ def find_ticket(number):
     r =  requests.get(api, headers=headers)
     data = json.loads(r.content)
 
-    back = datetime.utcnow() - timedelta(days=90)
-
     for issue in data['issues']:
         if str(issue['number']) == number:
-            updated = times.to_universal(issue['updated_at'])
-            if updated > back:
-                return format_ticket(issue)
+            return format_ticket(issue)
 
 
 def format_ticket(issue):
