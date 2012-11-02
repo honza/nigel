@@ -47,8 +47,12 @@ class SifterMatcher(BaseMatcher):
     name = 'sifter'
 
     def respond(self, message, user=None):
+        if user and user.startswith('unisubs-jenkins'):
+            return
+
         issues = parse(message)
         if len(issues) == 0:
             return
+
         message = str(", ".join(issues))
         self.speak(message)
