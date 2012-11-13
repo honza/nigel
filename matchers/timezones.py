@@ -47,7 +47,7 @@ class TimezoneMatcher(BaseMatcher):
         buffer = []
 
         for name,tz in self.timezones.items():
-            buffer.append("%s : %s" % (name, base_date.astimezone(tz)))
+            buffer.append("%s : %s" % (name.ljust(15), base_date.astimezone(tz)))
 
         message = str("\n".join(buffer))
         self.speak(message)
