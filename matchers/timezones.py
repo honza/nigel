@@ -23,7 +23,7 @@ class TimezoneMatcher(BaseMatcher):
     fmt = '%H:%M:%S %Z%z'
 
     pattern = re.compile('tz\s+(?P<hour>[\d]{1,2})\s+(?P<timezone_name>[\w]+)')
-    
+
     def respond(self, message, user=None):
         if not message.startswith('timezone') and not message.startswith('tz'):
             return
