@@ -107,7 +107,30 @@ class LogBotFactory(protocol.ClientFactory):
         reactor.stop()
 
 
+class FakeBot(object):
+
+    def msg(self, channel, message):
+        print message
+
+
 if __name__ == '__main__':
+    argv = sys.argv
+
+    if len(argv) > 1:
+        if argv[1] == '-s':
+            message = argv[2]
+
+            bot = FakeBot()
+
+            brain = Brain(bot, [BrbMatcher(), SifterMatcher(), GifterMatcher(),
+                JenkinsMatcher(), VolunteerMatcher(), TimezoneMatcher()])
+
+            brain.set_channel(None)
+
+            brain.handle('', message)
+
+        sys.exit(1)
+
     # initialize logging
     log.startLogging(sys.stdout)
 
