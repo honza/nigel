@@ -3,6 +3,8 @@ from base import BaseMatcher
 from pytz import timezone
 import pytz
 import re
+
+
 class TimezoneMatcher(BaseMatcher):
 
     name = 'timezone'
@@ -13,7 +15,9 @@ class TimezoneMatcher(BaseMatcher):
         'EST':timezone('US/Eastern'),
         'Sao Paulo': timezone('America/Sao_Paulo'),
         'San Francisco': timezone('America/Tijuana'),
-        'UTC': timezone('Etc/UTC')
+        'UTC': timezone('Etc/UTC'),
+        'AST': timezone('Canada/Eastern'),
+        'UTC': timezone('UTC')
     }
     fmt = '%H:%M:%S %Z%z'
     
@@ -42,8 +46,11 @@ class TimezoneMatcher(BaseMatcher):
                                           day=now.day, hour=now.hour,
                                           minute=now.minute, tzinfo=pytz.utc)
             
+
         buffer = []
+
         for name,tz in self.timezones.items():
             buffer.append("%s : %s" % (name, base_date.astimezone(tz)))
+
         message = str("\n".join(buffer))
         self.speak(message)
