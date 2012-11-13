@@ -16,7 +16,7 @@ class TimezoneMatcher(BaseMatcher):
         'Sao Paulo': timezone('America/Sao_Paulo'),
         'San Francisco': timezone('America/Tijuana'),
         'UTC': timezone('Etc/UTC'),
-        'AST': timezone('Canada/Eastern'),
+        'AST': timezone('America/Halifax'),
         'UTC': timezone('UTC')
     }
     fmt = '%H:%M:%S %Z%z'
@@ -42,10 +42,7 @@ class TimezoneMatcher(BaseMatcher):
                                           hour=convert_match.groupdict()['hour'],
                                           tzinfo=tz_info)
         else:
-            base_date = datetime.datetime(year=now.year, month=now.month,
-                                          day=now.day, hour=now.hour,
-                                          minute=now.minute, tzinfo=pytz.utc)
-            
+            base_date = now.reaplce(tzinfo=pytz.utc)
 
         buffer = []
 
