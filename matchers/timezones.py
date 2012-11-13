@@ -42,7 +42,7 @@ class TimezoneMatcher(BaseMatcher):
                                           hour=convert_match.groupdict()['hour'],
                                           tzinfo=tz_info)
         else:
-            base_date = now.reaplce(tzinfo=pytz.utc)
+            base_date = now.replace(tzinfo=pytz.utc)
 
         buffer = []
 
