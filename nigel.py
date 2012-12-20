@@ -81,6 +81,15 @@ class LogBot(irc.IRCClient):
 
         self.brain.handle(channel, msg, user)
 
+    def alterCollidedNick(self, nickname):
+        """
+        Generate an altered version of a nickname that caused a collision in an
+        effort to create an unused related name for subsequent registration.
+
+        By default it uses _.
+        """
+        return nickname + '____'
+
 
 class LogBotFactory(protocol.ClientFactory):
     """A factory for LogBots.
