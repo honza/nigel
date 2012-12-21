@@ -136,7 +136,7 @@ if __name__ == '__main__':
 
             brain.set_channel(None)
 
-            brain.handle('', message)
+            brain.handle('', message, 'le-user')
 
         sys.exit(1)
 

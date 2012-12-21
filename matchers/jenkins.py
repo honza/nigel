@@ -4,15 +4,11 @@ import json
 import os
 from datetime import datetime
 
-
-ENVS = {
-    'dev': os.environ.get('JENKINS_DEV', None),
-    'staging': os.environ.get('JENKINS_STAGING', None)
-}
+JENKINS_HOST = os.environ.get('JENKINS_HOST', None)
 
 
-def get_data(env):
-    url = ENVS[env]
+def get_data(name):
+    url = "%s/job/%s/api/json" % (JENKINS_HOST, name)
 
     if not url:
         print 'no url'
@@ -34,20 +30,27 @@ def get_data(env):
         'result': data['result'],
         'ago': minutes_ago,
         'url': data['url'],
-        'env': env
+        'env': name
     }
 
 
 def format_message(data):
     if not data:
         return None
-    return "Env: %s --- Status: %s --- Last build: %s minutes ago --- %s" \
+    return "%s, %s, Last build: %s minutes ago, %s" \
         % (data['env'], data['result'], data['ago'], data['url'])
 
 
 def main(env):
     data = get_data(env)
     return format_message(data)
+
+
+def get_jobs():
+    url = "%s/api/json" % JENKINS_HOST
+    r = requests.get(url)
+    data = r.json
+    return [j['name'] for j in data['jobs']]
 
 
 class JenkinsMatcher(BaseMatcher):
@@ -58,18 +61,9 @@ class JenkinsMatcher(BaseMatcher):
         if not user:
             return
 
-        if 'jenkins dev' in message:
-            message = main('dev')
-        elif 'jenkins staging' in message:
-            message = main('staging')
-        else:
-            return
+        jobs = get_jobs()
 
-        if not message:
-            return
+        messages = map(main, jobs)
 
-        self.speak(str(message))
-
-
-if __name__ == '__main__':
-    print main('dev')
+        for message in messages:
+            self.speak(str(message))
