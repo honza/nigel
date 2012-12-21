@@ -66,7 +66,20 @@ class JenkinsMatcher(BaseMatcher):
 
         jobs = get_jobs()
 
-        messages = map(main, jobs)
+        if message.startswith('jenkins list'):
+            messages = map(main, jobs)
 
-        for message in messages:
-            self.speak(str(message))
+            for message in messages:
+                self.speak(str(message))
+
+            return
+
+        words = message.split(' ')
+
+        if len(words) < 2:
+            return
+
+        job =  words[1]
+
+        if job in jobs:
+            self.speak(str(main(job)))
