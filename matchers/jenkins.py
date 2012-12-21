@@ -61,6 +61,9 @@ class JenkinsMatcher(BaseMatcher):
         if not user:
             return
 
+        if not message.startswith('jenkins'):
+            return
+
         jobs = get_jobs()
 
         messages = map(main, jobs)
