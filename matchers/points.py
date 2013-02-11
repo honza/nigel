@@ -46,6 +46,9 @@ class PointsMatcher(BaseMatcher):
     name = 'points'
 
     def respond(self, message, user=None):
+        if user not in people:
+            return
+
         if message.startswith(('leaderboard', 'scoreboard',)):
             msg = ", ".join(map(get_points, people))
             self.speak(msg)
