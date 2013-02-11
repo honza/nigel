@@ -1,15 +1,21 @@
 import os
 import re
 import redis
+import urlparse
 from base import BaseMatcher
 
 
 redis_url = os.environ.get('MYREDIS_URL', None)
 
+
 if redis_url:
-    r = redis.StrictRedis(redis_url)
+    urlparse.uses_netloc.append('redis')
+    url = urlparse.urlparse(redis_url)
+    r = redis.StrictRedis(host=url.hostname, port=url.port, db=0,
+            password=url.password)
 else:
     r = redis.StrictRedis()
+
 
 people = [
     'cz',
