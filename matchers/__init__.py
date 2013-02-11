@@ -9,3 +9,4 @@ from jenkins import JenkinsMatcher
 from volunteer import VolunteerMatcher
 from lunch import LunchMatcher
 from timezones import TimezoneMatcher
+from points import PointsMatcher

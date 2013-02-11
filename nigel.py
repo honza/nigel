@@ -5,7 +5,8 @@ from twisted.internet import reactor, protocol
 from twisted.python import log
 
 from matchers import (
-    BrbMatcher, SifterMatcher, GifterMatcher, JenkinsMatcher, VolunteerMatcher, TimezoneMatcher
+    BrbMatcher, SifterMatcher, GifterMatcher, JenkinsMatcher, VolunteerMatcher,
+    TimezoneMatcher, PointsMatcher
 )
 
 IGNORED_USERS = os.environ.get('IGNORED', '').split(',')
@@ -103,7 +104,8 @@ class LogBotFactory(protocol.ClientFactory):
     def buildProtocol(self, addr):
         p = LogBot()
         p.brain = Brain(p, [BrbMatcher(), SifterMatcher(), GifterMatcher(),
-            JenkinsMatcher(), VolunteerMatcher(), TimezoneMatcher()])
+            JenkinsMatcher(), VolunteerMatcher(), TimezoneMatcher(),
+            PointsMatcher()])
         p.factory = self
         return p
 
@@ -132,7 +134,8 @@ if __name__ == '__main__':
             bot = FakeBot()
 
             brain = Brain(bot, [BrbMatcher(), SifterMatcher(), GifterMatcher(),
-                JenkinsMatcher(), VolunteerMatcher(), TimezoneMatcher()])
+                JenkinsMatcher(), VolunteerMatcher(), TimezoneMatcher(),
+                PointsMatcher()])
 
             brain.set_channel(None)
 
