@@ -56,9 +56,12 @@ class PointsMatcher(BaseMatcher):
         if not res:
             return
 
-        user, op, value = res[0]
+        u, op, value = res[0]
 
-        stored_value = r.get(user)
+        if user == u:
+            return
+
+        stored_value = r.get(u)
         if stored_value is None:
             stored_value = 0.0
         else:
@@ -69,4 +72,4 @@ class PointsMatcher(BaseMatcher):
         else:
             stored_value -= float(value)
 
-        r.set(user, str(stored_value))
+        r.set(u, str(stored_value))
