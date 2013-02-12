@@ -27,7 +27,7 @@ people = [
     'honza',
 ]
 
-pattern = re.compile("^(%s):\ (\+|\-)([0-9\.]+) .*$" % '|'.join(people))
+pattern = re.compile("^(%s):\ (\+|\-)([0-9\.]+).*$" % '|'.join(people))
 
 
 def get_points(name):
@@ -57,6 +57,7 @@ class PointsMatcher(BaseMatcher):
             return
 
         res = re.findall(pattern, message)
+        print res
 
         if not res:
             return
