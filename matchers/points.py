@@ -53,7 +53,7 @@ class PointsMatcher(BaseMatcher):
             values = map(get_points, people)
             values.sort(key=lambda x: x[1])
             values.reverse()
-            self.speak(", ".join(["%s= %s" % v for v in values]))
+            self.speak(", ".join(["%s- %s" % v for v in values]))
             return
 
         res = re.findall(pattern, message)
