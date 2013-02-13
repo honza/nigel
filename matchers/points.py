@@ -38,7 +38,7 @@ def get_points(name):
     else:
         value = float(value)
 
-    return name, value
+    return "mr_%s" % name, value
 
 
 class PointsMatcher(BaseMatcher):
@@ -53,11 +53,10 @@ class PointsMatcher(BaseMatcher):
             values = map(get_points, people)
             values.sort(key=lambda x: x[1])
             values.reverse()
-            self.speak(", ".join(["_%s: %s" % v for v in values]))
+            self.speak(", ".join(["%s: %s" % v for v in values]))
             return
 
         res = re.findall(pattern, message)
-        print res
 
         if not res:
             return
