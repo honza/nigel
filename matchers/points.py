@@ -27,16 +27,16 @@ people = [
     'honza',
 ]
 
-pattern = re.compile("^(%s):\ (\+|\-)([0-9\.]+).*$" % '|'.join(people))
+pattern = re.compile("^(%s):\ (\+|\-)([0-9]+).*$" % '|'.join(people))
 
 
 def get_points(name):
     value = r.get(name)
 
     if value is None:
-        value = 0.0
+        value = 0
     else:
-        value = float(value)
+        value = int(value)
 
     return "mr_%s" % name, value
 
@@ -68,13 +68,13 @@ class PointsMatcher(BaseMatcher):
 
         stored_value = r.get(u)
         if stored_value is None:
-            stored_value = 0.0
+            stored_value = 0
         else:
-            stored_value = float(stored_value)
+            stored_value = int(stored_value)
 
         if op == '+':
-            stored_value += float(value)
+            stored_value += int(value)
         else:
-            stored_value -= float(value)
+            stored_value -= int(value)
 
         r.set(u, str(stored_value))
