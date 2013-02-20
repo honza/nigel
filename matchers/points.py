@@ -18,19 +18,29 @@ else:
 
 
 people = [
-    'cz',
-    'sjl',
-    'nicksergeant',
-    'ehazlett',
-    'arthurdebert',
-    'fernandotakai',
-    'honza',
+    ('cz', 'm',),
+    ('sjl', 'm',),
+    ('nicksergeant', 'm',),
+    ('ehazlett', 'm',),
+    ('arthurdebert', 'm',),
+    ('fernandotakai', 'm',),
+    ('honza', 'm',),
+    ('janeted', 'f',),
+    ('maggie_s', 'f',),
 ]
 
-pattern = re.compile("^(%s):\ (\+|\-)([0-9]+).*$" % '|'.join(people))
+titles = {
+    'm': 'mr',
+    'f': 'ms'
+}
+
+names = [p[0] for p in people]
+
+pattern = re.compile("^(%s):\ (\+|\-)([0-9]+).*$" % '|'.join(names))
 
 
-def get_points(name):
+def get_points(person):
+    name, gender = person
     value = r.get(name)
 
     if value is None:
@@ -38,7 +48,9 @@ def get_points(name):
     else:
         value = int(value)
 
-    return "mr_%s" % name, value
+    title = titles[gender]
+
+    return "%s_%s" % (title, name), value
 
 
 class PointsMatcher(BaseMatcher):
@@ -46,7 +58,7 @@ class PointsMatcher(BaseMatcher):
     name = 'points'
 
     def respond(self, message, user=None):
-        if user not in people:
+        if user not in names:
             return
 
         if message.startswith(('leaderboard', 'scoreboard',)):
