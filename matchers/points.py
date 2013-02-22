@@ -87,7 +87,12 @@ class PointsMatcher(BaseMatcher):
         if user == u:
             return
 
-        stored_value = r.get(u)
+        try:
+            stored_value = r.get(u)
+        except redis.exceptions.ConnectionError:
+            self.speak("heroku's redis is being a pita, sorry!")
+            return
+
         if stored_value is None:
             stored_value = 0
         else:
