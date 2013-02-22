@@ -39,30 +39,39 @@ names = [p[0] for p in people]
 pattern = re.compile("^(%s):\ (\+|\-)([0-9]+).*$" % '|'.join(names))
 
 
-def get_points(person):
-    name, gender = person
-    value = r.get(name)
-
-    if value is None:
-        value = 0
-    else:
-        value = int(value)
-
-    title = titles[gender]
-
-    return "%s_%s" % (title, name), value
-
-
 class PointsMatcher(BaseMatcher):
 
     name = 'points'
+
+    def get_points(self, person):
+        name, gender = person
+
+        try:
+            value = r.get(name)
+        except redis.exceptions.ConnectionError:
+            return None
+
+        if value is None:
+            value = 0
+        else:
+            value = int(value)
+
+        title = titles[gender]
+
+        return "%s_%s" % (title, name), value
 
     def respond(self, message, user=None):
         if user not in names:
             return
 
         if message.startswith(('leaderboard', 'scoreboard',)):
-            values = map(get_points, people)
+            values = map(self.get_points, people)
+            values = filter(None, values)
+
+            if not values:
+                self.speak("heroku's redis is being a pita, sorry!")
+                return
+
             values.sort(key=lambda x: x[1])
             values.reverse()
             self.speak(", ".join(["%s: %s" % v for v in values]))
@@ -89,4 +98,7 @@ class PointsMatcher(BaseMatcher):
         else:
             stored_value -= int(value)
 
-        r.set(u, str(stored_value))
+        try:
+            r.set(u, str(stored_value))
+        except redis.exceptions.ConnectionError:
+            self.speak("heroku's redis is being a pita, sorry!")
