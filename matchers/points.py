@@ -5,7 +5,8 @@ import urlparse
 from base import BaseMatcher
 
 
-redis_url = os.environ.get('MYREDIS_URL', None)
+# redis_url = os.environ.get('MYREDIS_URL', None)
+redis_url = os.environ.get('REDISTOGO_URL', None)
 
 
 if redis_url:
