@@ -103,6 +103,11 @@ class PointsMatcher(BaseMatcher):
             self.speak(", ".join(["%s: %s" % v for v in values]))
             return
 
+        if message.startswith('quota'):
+            value = r.hget(user, 'left')
+            self.speak(user + ': you have %s left' % value)
+            return
+
         res = re.findall(pattern, message)
 
         if not res:
