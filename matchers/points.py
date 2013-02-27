@@ -2,11 +2,14 @@ import os
 import re
 import redis
 import urlparse
+from datetime import datetime
 from base import BaseMatcher
 
 
-# redis_url = os.environ.get('MYREDIS_URL', None)
 redis_url = os.environ.get('REDISTOGO_URL', None)
+
+DAILY_ALLOWANCE = 10
+DATE = 'latest_date'
 
 
 if redis_url:
@@ -40,6 +43,14 @@ names = [p[0] for p in people]
 pattern = re.compile("^(%s):\ (\+|\-)([0-9]+).*$" % '|'.join(names))
 
 
+def utc_str():
+    return datetime.utcnow().strftime('%Y-%m-%d')
+
+
+def from_utc_str(s):
+    return datetime.strptime(s, '%Y-%m-%d')
+
+
 class PointsMatcher(BaseMatcher):
 
     name = 'points'
@@ -47,30 +58,44 @@ class PointsMatcher(BaseMatcher):
     def get_points(self, person):
         name, gender = person
 
-        try:
-            value = r.get(name)
-        except redis.exceptions.ConnectionError:
-            return None
+        value = r.hgetall(name)
 
-        if value is None:
-            value = 0
-        else:
-            value = int(value)
+        if not value:
+            value = {
+                'score': 0,
+                'left': DAILY_ALLOWANCE
+            }
+
+            r.hmset(name, value)
 
         title = titles[gender]
 
-        return "%s_%s" % (title, name), value
+        return "%s_%s" % (title, name), value['score']
 
     def respond(self, message, user=None):
         if user not in names:
             return
+
+        # Update points left
+        latest_date = r.get(DATE)
+        now = datetime.utcnow().date()
+
+        if not latest_date:
+            latest_date = utc_str()
+            r.set(DATE, latest_date)
+        else:
+            delta = now - from_utc_str(latest_date).date()
+            if delta.days > 0:
+                for person in names:
+                    r.hset(person, 'left', 5)
+
+                r.set(DATE, utc_str())
 
         if message.startswith(('leaderboard', 'scoreboard',)):
             values = map(self.get_points, people)
             values = filter(None, values)
 
             if not values:
-                self.speak("heroku's redis is being a pita, sorry!")
                 return
 
             values.sort(key=lambda x: x[1])
@@ -84,27 +109,44 @@ class PointsMatcher(BaseMatcher):
             return
 
         u, op, value = res[0]
+        value = int(value)
 
         if user == u:
+            self.speak(user + ': lol, did you really just try to give points to yourself?')
             return
 
-        try:
-            stored_value = r.get(u)
-        except redis.exceptions.ConnectionError:
-            self.speak("heroku's redis is being a pita, sorry!")
+        if u not in names:
             return
 
-        if stored_value is None:
-            stored_value = 0
-        else:
-            stored_value = int(stored_value)
+        source_user_hash = r.hgetall(user)
+        dest_user_hash = r.hgetall(u)
+
+        if not source_user_hash:
+            source_user_hash = {
+                'score': 0,
+                'left': DAILY_ALLOWANCE
+            }
+
+        if not dest_user_hash:
+            dest_user_hash = {
+                'score': 0,
+                'left': DAILY_ALLOWANCE
+            }
 
         if op == '+':
-            stored_value += int(value)
-        else:
-            stored_value -= int(value)
+            if int(source_user_hash.get('left', 0)) < value:
+                # Not enough points left for the day
+                self.speak(user + ': not enough points left, lol')
+                return
 
-        try:
-            r.set(u, str(stored_value))
-        except redis.exceptions.ConnectionError:
-            self.speak("heroku's redis is being a pita, sorry!")
+        if op == '+':
+            r.hincrby(u, 'score', value)
+            r.hincrby(user, 'left', value * -1)
+
+        if op == '-':
+            if int(source_user_hash.get('score', 0)) < value:
+                # Not enough of own points
+                self.speak(user + ': not enough score, lol')
+            else:
+                r.hincrby(u, 'score', value * -1)
+                r.hincrby(user, 'score', value * -1)
