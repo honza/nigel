@@ -87,7 +87,7 @@ class PointsMatcher(BaseMatcher):
             delta = now - from_utc_str(latest_date).date()
             if delta.days > 0:
                 for person in names:
-                    r.hset(person, 'left', 5)
+                    r.hset(person, 'left', DAILY_ALLOWANCE)
 
                 r.set(DATE, utc_str())
 
