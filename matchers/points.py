@@ -70,7 +70,7 @@ class PointsMatcher(BaseMatcher):
 
         title = titles[gender]
 
-        return "%s_%s" % (title, name), value['score']
+        return "%s_%s" % (title, name), int(value['score'])
 
     def respond(self, message, user=None):
         if user not in names:
