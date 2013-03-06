@@ -6,7 +6,7 @@ from twisted.python import log
 
 from matchers import (
     BrbMatcher, SifterMatcher, GifterMatcher, JenkinsMatcher, VolunteerMatcher,
-    TimezoneMatcher, PointsMatcher
+    TimezoneMatcher, PointsMatcher, SillyMatcher
 )
 
 IGNORED_USERS = os.environ.get('IGNORED', '').split(',')
@@ -105,7 +105,7 @@ class LogBotFactory(protocol.ClientFactory):
         p = LogBot()
         p.brain = Brain(p, [BrbMatcher(), SifterMatcher(), GifterMatcher(),
             JenkinsMatcher(), VolunteerMatcher(), TimezoneMatcher(),
-            PointsMatcher()])
+            PointsMatcher(), SillyMatcher()])
         p.factory = self
         return p
 
@@ -135,7 +135,7 @@ if __name__ == '__main__':
 
             brain = Brain(bot, [BrbMatcher(), SifterMatcher(), GifterMatcher(),
                 JenkinsMatcher(), VolunteerMatcher(), TimezoneMatcher(),
-                PointsMatcher()])
+                PointsMatcher(), SillyMatcher()])
 
             brain.set_channel(None)
 
