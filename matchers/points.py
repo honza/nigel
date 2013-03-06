@@ -76,6 +76,8 @@ class PointsMatcher(BaseMatcher):
         if user not in names:
             return
 
+        message = message.strip()
+
         # Update points left
         latest_date = r.get(DATE)
         now = datetime.utcnow().date()
