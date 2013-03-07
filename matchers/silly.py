@@ -9,10 +9,18 @@ words = [
     'shut',
     'broken',
     'wake',
-    'lazy'
+    'lazy',
+    'screw',
+    'fuck',
+    'crap',
+    'shit',
+    'pita',
+    'friggin',
+    'ass',
+    'fu',
 ]
 
-PATTERN = re.compile('|'.join(words))
+PATTERN = re.compile('|'.join(words), re.IGNORECASE)
 
 
 class SillyMatcher(BaseMatcher):
